@@ -1,7 +1,7 @@
 {
   "name": "daml-highlighter",
-  "displayName": "Daml Syntax Highlighter",
-  "description": "Syntax highlighting for Daml (.daml) files. No SDK required.",
+  "displayName": "Daml Highlighter",
+  "description": "Highlighter for Daml (.daml) files. No SDK required.",
   "version": "0.0.1",
   "publisher": "alim5",
   "license": "Apache-2.0",
