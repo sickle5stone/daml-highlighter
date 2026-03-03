@@ -2,7 +2,7 @@
   "name": "daml-highlighter",
   "displayName": "Daml Highlighter",
   "description": "Highlighter for Daml (.daml) files. No SDK required.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "publisher": "alim5",
   "license": "Apache-2.0",
   "icon": "icon.png",
