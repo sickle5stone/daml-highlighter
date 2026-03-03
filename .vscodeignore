@@ -1,0 +1,9 @@
+.git
+.gitignore
+node_modules
+*.md
+!CHANGELOG.md
+!README.md
+icon.svg
+example.daml
+screenshot.png

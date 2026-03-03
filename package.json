@@ -1,0 +1,52 @@
+{
+  "name": "daml-highlighter",
+  "displayName": "Daml Syntax Highlighter",
+  "description": "Syntax highlighting for Daml (.daml) files. No SDK required.",
+  "version": "0.0.1",
+  "publisher": "alim5",
+  "license": "Apache-2.0",
+  "icon": "icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sickle5stone/daml-highlighter"
+  },
+  "bugs": {
+    "url": "https://github.com/sickle5stone/daml-highlighter/issues"
+  },
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "keywords": [
+    "daml",
+    "canton",
+    "smart contracts",
+    "digital asset",
+    "blockchain",
+    "syntax highlighting"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "daml",
+        "aliases": [
+          "Daml",
+          "DAML"
+        ],
+        "extensions": [
+          ".daml"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "daml",
+        "scopeName": "source.daml",
+        "path": "./syntaxes/daml.tmLanguage.json"
+      }
+    ]
+  }
+}

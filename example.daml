@@ -1,0 +1,102 @@
+module Token where
+
+import DA.Optional (fromSome)
+
+-- | A simple token representing a fungible asset on the ledger.
+data TokenInfo = TokenInfo
+  with
+    tokenId      : Text
+    denomination : Text
+    mintedAt     : Time
+  deriving (Eq, Show)
+
+template Token
+  with
+    issuer  : Party
+    owner   : Party
+    amount  : Decimal
+    info    : TokenInfo
+  where
+    signatory issuer, owner
+    observer issuer
+
+    ensure amount > 0.0
+
+    {- Transfer tokens to another party.
+       Splits into receiver + remainder if partial. -}
+    choice Transfer : (ContractId Token, Optional (ContractId Token))
+      with
+        receiver       : Party
+        transferAmount : Decimal
+      controller owner
+      do
+        assertMsg "Amount must be positive" (transferAmount > 0.0)
+        assertMsg "Insufficient balance" (transferAmount <= amount)
+        now <- getTime
+
+        receiverCid <- create this with
+          owner = receiver
+          amount = transferAmount
+          info = info with mintedAt = now
+
+        remainderCid <- if transferAmount < amount
+          then Some <$> create this with
+            amount = amount - transferAmount
+          else return None
+
+        return (receiverCid, remainderCid)
+
+-- | Mint proposal: issuer proposes, owner accepts.
+template MintProposal
+  with
+    issuer : Party
+    owner  : Party
+    amount : Decimal
+    denom  : Text
+  where
+    signatory issuer
+    observer owner
+
+    choice Accept : ContractId Token
+      controller owner
+      do
+        now <- getTime
+        create Token with
+          issuer
+          owner
+          amount
+          info = TokenInfo with
+            tokenId = show issuer <> "-" <> show now
+            denomination = denom
+            mintedAt = now
+
+    choice Reject : ()
+      controller owner
+      do return ()
+
+-- Test: mint 1000 tokens, transfer 250
+tokenTest : Script ()
+tokenTest = script do
+  bank  <- allocateParty "Bank"
+  alice <- allocateParty "Alice"
+  bob   <- allocateParty "Bob"
+
+  proposal <- submit bank do
+    createCmd MintProposal with
+      issuer = bank
+      owner = alice
+      amount = 1_000.0
+      denom = "USD"
+
+  tokenCid <- submit alice do
+    exerciseCmd proposal Accept
+
+  (bobCid, aliceRemainder) <- submit alice do
+    exerciseCmd tokenCid Transfer with
+      receiver = bob
+      transferAmount = 250.0
+
+  token <- queryContractId bob bobCid
+  debug $ "Bob received: " <> show (fromSome token).amount
+
+  return ()
